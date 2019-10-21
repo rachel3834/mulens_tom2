@@ -1,0 +1,33 @@
+{% extends 'tom_common/base.html' %}
+{% load static targets_extras observation_extras dataproduct_extras tom_common_extras %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-4">
+          <a href="{% url 'targets:list' %}">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h4 class="panel-title">View Current Targets</h4>
+                </div>
+               <div class="panel-body">
+                  <center><img src="{% static 'img/SOAR2019_targetlist_img.png'%}" width="300pix" height="200pix"></center>
+               </div>
+            </div>
+            </a>
+        </div>
+            <div class="col-lg-4">
+              <a href="{% url 'targets:create' %}">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                      <h4 class="panel-title">Add New Target</h4>
+                    </div>
+                   <div class="panel-body">
+                      <center><img src="{% static 'img/SOAR2019_targetlist_img.png'%}" width="300pix" height="200pix"></center>
+                   </div>
+                </div>
+                </a>
+            </div>
+    </div>
+</div>
+{% endblock %}

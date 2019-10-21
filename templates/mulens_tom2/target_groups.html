@@ -1,0 +1,24 @@
+{% extends 'tom_common/base.html' %}
+{% load static targets_extras observation_extras dataproduct_extras tom_common_extras %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        {% for grouping in groupings %}
+        {{grouping.name}}
+            <div class="col-lg-4">
+                <a href="{% url 'targets:list' pk=grouping.id %}">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                      <h4 class="panel-title">{{grouping.name}}</h4>
+                    </div>
+                   <div class="panel-body">
+                      <center><img src="{% static 'img/{{grouping.name}}_targetlist_img.png'%}" width="300pix" height="200pix"></center>
+                   </div>
+                </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
