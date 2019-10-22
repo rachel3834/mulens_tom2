@@ -15,9 +15,13 @@ Including another URLconf
 """
 from django.urls import path, include
 
-from mulens_tom2.views import TargetGroupsView
+from .views import TargetGroupsView, MulensTargetCreateView, MulensTargetListView
+
+app_name = 'mulens_tom2'
 
 urlpatterns = [
     path('', include('tom_common.urls')),
     path('', TargetGroupsView.as_view(template_name='mulens_tom2/target_groups.html'), name='target_groups'),
+    path('create/', MulensTargetCreateView.as_view(template_name='tom_targets/target_form.html'), name='create_mulens'),
+    path('targetlist/', MulensTargetListView.as_view(template_name='tom_targets/target_list.html'), name='targetlist'),
 ]

@@ -8,7 +8,7 @@ For customization instructions, see tom_common/base.html
     <a class="nav-link" href="{% url 'targets:targetgrouping' %}">Target Lists</a>
 </li>
 <li class="nav-item {% if request.resolver_match.namespace == 'targets' %}active{% endif %}">
-    <a class="nav-link" href="{% url 'targets:list' %}">Targets</a>
+    <a class="nav-link" href="{% url 'targetlist' %}">Targets</a>
 </li>
 <li class="nav-item {% if request.resolver_match.namespace == 'alerts' %}active{% endif %}">
     <a class="nav-link" href="{% url 'alerts:list' %}">Alerts</a>
