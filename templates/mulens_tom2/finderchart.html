@@ -1,6 +1,3 @@
-{% extends 'tom_common/base.html' %}
-{% load static targets_extras observation_extras dataproduct_extras tom_common_extras %}
-{% block title %}Home{% endblock %}
-{% block content %}
-
-{% endblock %}
+<div class="data-pane box-frame">
+  {{ plot|safe }}
+</div>

@@ -29,7 +29,7 @@ def navigable_image(target):
         image_file = None
         for data in qs:
             if '_finder_' in str(data.data):
-                image_file = path.join(settings.BASE_DIR, 'data', str(data.data))
+                image_file = path.join('/data', str(data.data))
 
         if len(params) == len(keylist):
             return params, image_file
@@ -37,26 +37,17 @@ def navigable_image(target):
             return {},None
 
     (params,image_file) = fetch_finder(target)
-    
+
     if len(params) > 0:
         half_width_y = ( (params['finder_naxis1']/2.0) * params['finder_pixscale'] ) / 3600.0
         half_width_x = ( (params['finder_naxis2']/2.0) * params['finder_pixscale'] ) / 3600.0
 
-        xdata = np.arange(float(target.ra)-half_width_x,float(target.ra)+half_width_x,0.25)
-        ydata = np.arange(float(target.dec)-half_width_y,float(target.dec)+half_width_y,0.25)
+        xdata = np.linspace(float(target.ra)-half_width_x,float(target.ra)+half_width_x,50.0)
+        ydata = np.linspace(float(target.dec)-half_width_y,float(target.dec)+half_width_y,50.0)
 
-        scale_factor = 0.2
+        scale_factor = 1.75
 
         fig = go.Figure()
-
-        fig.add_trace(
-                    go.Scatter(
-                        x=xdata,
-                        y=ydata,
-                        mode="markers",
-                        marker_opacity=0
-                    )
-                )
 
         fig.update_xaxes(
                     visible=True,
@@ -66,9 +57,9 @@ def navigable_image(target):
                         text='RA [mag]',
                         font=dict(
                             size=18,
-                            color='white')),
-                    linecolor='white',
-                    color = 'white'
+                            color='black')),
+                    linecolor='black',
+                    color = 'black'
                 )
 
         fig.update_yaxes(
@@ -80,9 +71,9 @@ def navigable_image(target):
                         text='Dec [deg]',
                         font=dict(
                             size=18,
-                            color='white')),
-                    linecolor='white',
-                    color = 'white'
+                            color='black')),
+                    linecolor='black',
+                    color = 'black'
                 )
 
         fig.update_layout(
@@ -100,14 +91,13 @@ def navigable_image(target):
                 )
 
         fig.update_layout(
-                    title='Reference Image',
-                    font=dict(color="white",size=20),
+                    font=dict(color="black",size=20),
                     width=(params['finder_naxis1']*scale_factor),
                     height=(params['finder_naxis2']*scale_factor),
                     #margin={"l": 0, "r": 0, "t": 0, "b": 0},
                     margin={"l": 55, "r": 15, "t": 55, "b": 55},
-                    plot_bgcolor='black',
-                    paper_bgcolor='black',
+                    plot_bgcolor='white',
+                    paper_bgcolor='white',
                 )
 
         return {
