@@ -1,0 +1,27 @@
+{% extends 'tom_common/base.html' %}
+{% load static targets_extras observation_extras dataproduct_extras tom_common_extras %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+  {% for grouping in groupings %}
+        <div class="col-lg-2">
+          <a href="{% url 'targets:list' %}">
+            <div class="dashboard-panel">
+                <div class="panel-heading">
+                  <center><h4 class="dashboard-panel-title">{{grouping.name}}</h4></center>
+                </div>
+               <div class="panel-body">
+                  <center><img src="{% static grouping.image_path %}" width="300pix" height="250pix"></center>
+               </div>
+            </div>
+            </a>
+        </div>
+    {% endfor %}
+    </div>
+    {% if message|length > 0 %}
+      <div class="row">
+        <p><h4>{{message}}</h4></p>
+    {% endif %}
+</div>
+{% endblock %}

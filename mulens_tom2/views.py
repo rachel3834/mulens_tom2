@@ -14,15 +14,29 @@ from django.contrib.auth.models import Group
 
 from tom_targets.models import Target, TargetList
 from tom_targets.filters import TargetFilter
+from tom_targets.views import TargetCreateView
+from tom_targets.forms import TargetExtraFormset, TargetNamesFormset
 from .forms import MulensTargetForm
-from tom_targets.forms import (
-    SiderealTargetCreateForm, TargetExtraFormset, TargetNamesFormset
-)
 
 register = template.Library()
 
-class UserGroupsView(LoginRequiredMixin):
-    template_name = 'mulens_tom2/user_groups.html'
+class UserProjectDashboard(LoginRequiredMixin, FilterView):
+    template_name = 'mulens_tom2/project_dashboard.html'
+    permission_required = 'tom_targets.view_target'
+    model = TargetList
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        if self.request.user.is_authenticated:
+            context['groupings'] = TargetList.objects.all()
+            context['message'] = ''
+            for tl in context['groupings']:
+                tl.image_path = 'img/'+tl.name+'_targetlist_img.png'
+        else:
+            context['groupings'] = []
+            context['message'] = 'Please login to see your Projects'
+        return context
 
 class TargetGroupsView(LoginRequiredMixin, FilterView):
     template_name = 'tom_targets/target_groups.html'
@@ -35,8 +49,10 @@ class TargetGroupsView(LoginRequiredMixin, FilterView):
         # hide target grouping list if user not logged in
         if self.request.user.is_authenticated:
             context['groupings'] = TargetList.objects.all()
+            context['message'] = 'Got targetlists'
         else:
             context['groupings'] = TargetList.objects.none()
+            context['message'] = 'Please login to see your Projects'
 
         return context
 
@@ -58,48 +74,12 @@ class MulensTargetListView(PermissionListMixin, FilterView):
         context['query_string'] = self.request.META['QUERY_STRING']
         return context
 
-class MulensTargetCreateView(LoginRequiredMixin, CreateView):
+class MulensTargetCreateView(TargetCreateView):
     """
     View for creating a Target
     """
 
     model = Target
-    fields = ['name', 'type', 'ra', 'dec']
-
-    def get_default_target_type(self):
-        """
-        Returns the user-configured target type specified in settings.py, if it exists, otherwise returns sidereal
-
-        :returns: User-configured target type or global default
-        :rtype: str
-        """
-        return Target.SIDEREAL
-
-    def get_target_type(self):
-        obj = self.request.GET or self.request.POST
-        target_type = obj.get('type')
-        # If None or some invalid value, use default target type
-        if target_type not in (Target.SIDEREAL, Target.NON_SIDEREAL):
-            target_type = self.get_default_target_type()
-        return target_type
-
-    def get_initial(self):
-        """
-        Returns the initial data to use for forms on this view.
-
-        :returns: Dictionary with the following keys:
-
-                  `type`: ``str``: Type of the target to be created
-
-                  `groups`: ``QuerySet<Group>`` Groups available to the current user
-
-        :rtype: dict
-        """
-        return {
-            'type': self.get_target_type(),
-            'groups': self.request.user.groups.all(),
-            **dict(self.request.GET.items())
-        }
 
     def get_context_data(self, **kwargs):
         """
@@ -119,22 +99,27 @@ class MulensTargetCreateView(LoginRequiredMixin, CreateView):
         context['extra_form'] = TargetExtraFormset()
         return context
 
-    def get_form_class(self):
-        """
-        Return the form class to use in this view.
-        """
-        target_type = self.get_target_type()
-        self.initial['type'] = target_type
-        return MulensTargetForm
+class MulensTargetUpdateView(PermissionRequiredMixin, UpdateView):
+    permission_required = 'tom_targets.change_target'
+    model = Target
+    fields = '__all__'
+
+    def get_context_data(self, **kwargs):
+        extra_field_names = [extra['name'] for extra in settings.EXTRA_FIELDS]
+        context = super().get_context_data(**kwargs)
+        context['names_form'] = TargetNamesFormset(instance=self.object)
+        context['extra_form'] = TargetExtraFormset(
+            instance=self.object,
+            queryset=self.object.targetextra_set.exclude(key__in=extra_field_names)
+        )
+        return context
 
     def form_valid(self, form):
         super().form_valid(form)
-        extra = TargetExtraFormset(self.request.POST)
-        names = TargetNamesFormset(self.request.POST)
+        extra = TargetExtraFormset(self.request.POST, instance=self.object)
+        names = TargetNamesFormset(self.request.POST, instance=self.object)
         if extra.is_valid() and names.is_valid():
-            extra.instance = self.object
             extra.save()
-            names.instance = self.object
             names.save()
         else:
             form.add_error(None, extra.errors)
@@ -143,6 +128,20 @@ class MulensTargetCreateView(LoginRequiredMixin, CreateView):
             form.add_error(None, names.non_form_errors())
             return super().form_invalid(form)
         return redirect(self.get_success_url())
+
+    def get_queryset(self, *args, **kwargs):
+        return get_objects_for_user(self.request.user, 'tom_targets.change_target')
+
+    def get_form_class(self):
+        if self.object.type == Target.SIDEREAL:
+            return SiderealTargetCreateForm
+        elif self.object.type == Target.NON_SIDEREAL:
+            return NonSiderealTargetCreateForm
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['groups'] = get_groups_with_perms(self.get_object())
+        return initial
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)

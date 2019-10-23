@@ -5,7 +5,7 @@ For customization instructions, see tom_common/base.html
 {% endcomment %}
 
 <li class="nav-item {% if request.resolver_match.namespace == 'targets' %}active{% endif %}">
-    <a class="nav-link" href="{% url 'targets:targetgrouping' %}">Target Lists</a>
+    <a class="nav-link" href="{% url 'project_dashboard' %}">Projects</a>
 </li>
 <li class="nav-item {% if request.resolver_match.namespace == 'targets' %}active{% endif %}">
     <a class="nav-link" href="{% url 'targetlist' %}">Targets</a>

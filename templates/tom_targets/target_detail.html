@@ -1,5 +1,6 @@
 {% extends 'tom_common/base.html' %}
 {% load comments bootstrap4 tom_common_extras targets_extras observation_extras dataproduct_extras static cache %}
+{% load targetparameterstag findercharttag %}
 {% block title %}Target {{ object.name }}{% endblock %}
 {% block additional_css %}
 <link rel="stylesheet" href="{% static 'tom_targets/css/main.css' %}">
@@ -8,13 +9,13 @@
 <div class="row">
   <div class="col-md-4">
     <div id="target-info">
-      {% target_feature object %}
+      {% navigable_image object %}
       {% if object.future_observations %}
       <div class="alert alert-success">
         {{ object.future_observations|length }} upcoming observation{{ object.future_observations|pluralize }}
       </div>
       {% endif %}
-      {% target_data object %}
+      {% target_parameters object %}
     </div>
   </div>
   <div class="col-md-8">

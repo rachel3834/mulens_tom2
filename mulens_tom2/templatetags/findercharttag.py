@@ -1,13 +1,16 @@
 from django import template
 from plotly import offline
 import plotly.graph_objs as go
-from tom_targets.models import Target
+from tom_targets.models import Target, TargetExtra
 from tom_dataproducts.models import DataProduct
+from django.conf import settings
+import numpy as np
+from os import path
 
 register = template.Library()
 
 
-@register.inclusion_tag('mulens_tom/finderchart.html')
+@register.inclusion_tag('mulens_tom2/finderchart.html')
 def navigable_image(target):
 
     def fetch_finder(target):
@@ -18,7 +21,6 @@ def navigable_image(target):
 
         for key in keylist:
             qs = TargetExtra.objects.filter(target=target, key=key)
-
             if len(qs) > 0:
                 params[key] = float(qs[0].value)
 
@@ -26,8 +28,8 @@ def navigable_image(target):
 
         image_file = None
         for data in qs:
-            if 'finder' in data.data:
-                image_file = data.data
+            if '_finder_' in str(data.data):
+                image_file = path.join(settings.BASE_DIR, 'data', str(data.data))
 
         if len(params) == len(keylist):
             return params, image_file
@@ -35,10 +37,10 @@ def navigable_image(target):
             return {},None
 
     (params,image_file) = fetch_finder(target)
-
+    
     if len(params) > 0:
-        half_width_y = ( (params['naxis1']/2.0) * params['pixscale'] ) / 3600.0
-        half_width_x = ( (params['naxis2']/2.0) * params['pixscale'] ) / 3600.0
+        half_width_y = ( (params['finder_naxis1']/2.0) * params['finder_pixscale'] ) / 3600.0
+        half_width_x = ( (params['finder_naxis2']/2.0) * params['finder_pixscale'] ) / 3600.0
 
         xdata = np.arange(float(target.ra)-half_width_x,float(target.ra)+half_width_x,0.25)
         ydata = np.arange(float(target.dec)-half_width_y,float(target.dec)+half_width_y,0.25)
@@ -100,8 +102,8 @@ def navigable_image(target):
         fig.update_layout(
                     title='Reference Image',
                     font=dict(color="white",size=20),
-                    width=(params['naxis1']*scale_factor),
-                    height=(params['naxis2']*scale_factor),
+                    width=(params['finder_naxis1']*scale_factor),
+                    height=(params['finder_naxis2']*scale_factor),
                     #margin={"l": 0, "r": 0, "t": 0, "b": 0},
                     margin={"l": 55, "r": 15, "t": 55, "b": 55},
                     plot_bgcolor='black',
@@ -115,7 +117,7 @@ def navigable_image(target):
 
     else:
 
-        plot = '<img src="{% static img/'+str(target.name)+'_colour.png %}" class="img-fluid mx-auto">'
+        plot = '<img src="{% data '+image_file+' %}" class="img-fluid mx-auto">'
 
         return {'target': target,
                 'plot': plot}
