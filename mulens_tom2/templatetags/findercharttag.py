@@ -102,12 +102,32 @@ def navigable_image(target):
 
         return {
             'target': target,
-            'plot': offline.plot(fig, output_type='div', show_link=False)
+            'plot': offline.plot(fig, output_type='div', show_link=False),
         }
 
     else:
 
-        plot = '<img src="{% data '+image_file+' %}" class="img-fluid mx-auto">'
+        if image_file != None:
+            plot = '<img src="{% data '+image_file+' %}" class="img-fluid mx-auto">'
+
+        else:
+            plot = """<!-- include Aladin Lite CSS file in the head section of your page -->
+            <link rel="stylesheet" href="//aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
+            <!-- insert this snippet where you want Aladin Lite viewer to appear and after the loading of jQuery -->
+            <div id="aladin-lite-div" style="width:300px;height:300px;"></div>
+            <script type="text/javascript" src="//aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
+            <script type="text/javascript">
+                var aladin = A.aladin('#aladin-lite-div', {
+                  survey: "P/DSS2/color",
+                  fov:5,
+                  target: """+'"'+str(target.ra)+' '+str(target.dec)+'"'+""",
+                  showGotoControl: false,
+                });
+                var target_cat = A.catalog({name: '"""+str(target.name)+"""', sourceSize: 10, color: 'red'});
+                aladin.addCatalog(target_cat, {shape: 'circle'});
+                target_cat.addSources([A.marker("""+str(target.ra)+', '+str(target.dec)+""",
+                  {popupTitle: '"""+str(target.name)+"""'})]);
+            </script>"""
 
         return {'target': target,
                 'plot': plot}

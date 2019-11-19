@@ -222,6 +222,7 @@ TOM_ALERT_CLASSES = [
     'tom_alerts.brokers.mars.MARSBroker',
     'tom_alerts.brokers.lasair.LasairBroker',
     'tom_alerts.brokers.scout.ScoutBroker',
+    'mulens_tom2.gaiaalerts.GaiaAlertsBroker'
 ]
 
 BROKER_CREDENTIALS = {
@@ -269,6 +270,13 @@ AUTO_THUMBNAILS = False
 THUMBNAIL_MAX_SIZE = (0, 0)
 
 THUMBNAIL_DEFAULT_SIZE = (200, 200)
+
+DATA_PRODUCT_TYPES = {
+    'photometry': ('photometry', 'Photometry'),
+    'fits_file': ('fits_file', 'FITS File'),
+    'spectroscopy': ('spectroscopy', 'Spectroscopy'),
+    'image_file': ('image_file', 'Image File')
+}
 
 HINTS_ENABLED = True
 HINT_LEVEL = 20
