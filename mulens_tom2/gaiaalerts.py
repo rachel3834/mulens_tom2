@@ -8,6 +8,7 @@ from astropy.coordinates import SkyCoord
 from astropy.time import Time, TimezoneInfo
 import astropy.units as u
 import requests
+from requests.exceptions import HTTPError
 import json
 from os import path
 
@@ -47,22 +48,32 @@ class GaiaAlertsBroker(GenericBroker):
                                                  frame="icrs", unit="deg")
 
         filtered_alerts = []
-        for alert in alert_list:
-            if parameters['target_name'] != None and len(parameters['target_name']) > 0:
+        if parameters['target_name'] != None and len(parameters['target_name']) > 0:
+            for alert in alert_list:
                 if parameters['target_name'] in alert['name']:
                     filtered_alerts.append(alert)
-            else:
-                filtered_alerts.append(alert)
 
-        filtered_alerts2 = []
-        for alert in filtered_alerts:
-            if 'cone_radius' in parameters.keys():
+
+        elif 'cone_radius' in parameters.keys():
+            for alert in alert_list:
                 c = SkyCoord(float(alert['ra']), float(alert['dec']),
                              frame="icrs", unit="deg")
                 if parameters['cone_centre'].separation(c) <= parameters['cone_radius']:
-                    filtered_alerts2.append(alert)
+                    filtered_alerts.append(alert)
 
-        return iter(filtered_alerts2)
+        else:
+            filtered_alerts = alert_list
+
+        return iter(filtered_alerts)
+
+    def fetch_alert(self, target_name):
+
+        alert_list = list(self.fetch_alerts({'target_name': target_name, 'cone': None}))
+
+        if len(alert_list) == 1:
+            return alert_list[0]
+        else:
+            return {}
 
     def to_generic_alert(self, alert):
         timestamp = parse(alert['obstime'])
@@ -82,6 +93,14 @@ class GaiaAlertsBroker(GenericBroker):
     def process_reduced_data(self, target, alert=None):
 
         base_url = BROKER_URL.replace('/alertsindex', '/alert')
+
+        if not alert:
+            try:
+                alert = self.fetch_alert(target.name)
+
+            except HTTPError:
+                raise Exception('Unable to retrieve alert information from broker')
+
         alert_url = BROKER_URL.replace('/alerts/alertsindex',
                                         alert['per_alert']['link'])
 
