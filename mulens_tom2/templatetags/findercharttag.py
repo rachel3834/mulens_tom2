@@ -114,7 +114,7 @@ def navigable_image(target):
             plot = """<!-- include Aladin Lite CSS file in the head section of your page -->
             <link rel="stylesheet" href="//aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
             <!-- insert this snippet where you want Aladin Lite viewer to appear and after the loading of jQuery -->
-            <div id="aladin-lite-div" style="width:300px;height:300px;"></div>
+            <div id="aladin-lite-div" style="width:600px;height:600px;"></div>
             <script type="text/javascript" src="//aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
             <script type="text/javascript">
                 var aladin = A.aladin('#aladin-lite-div', {
