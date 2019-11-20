@@ -1,0 +1,35 @@
+{% extends 'tom_common/base.html' %}
+{% load static targets_extras observation_extras dataproduct_extras tom_common_extras %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<p><h2></p>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-6">
+          <a href="{% url 'project_dashboard' %}">
+            <div class="dashboard-panel">
+                <div class="panel-footer">
+                  <h4 class="dashboard-panel-title">View current projects</h4>
+                </div>
+               <div class="panel-body">
+                  <center><img src="{% static 'img/project_icon.png'%}" width="350pix" height="250pix"></center>
+               </div>
+            </div>
+            </a>
+        </div>
+            <div class="col-lg-6">
+              <a href="{% url 'user-list' %}">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                      <h4 class="panel-title">User Account Management</h4>
+                    </div>
+                   <div class="panel-body">
+                      <center><img src="{% static 'img/people_icon3.png'%}" width="300pix" height="250pix"></center>
+                   </div>
+                </div>
+                </a>
+            </div>
+    </div>
+</div>
+<p>{{message}}</p>
+{% endblock %}

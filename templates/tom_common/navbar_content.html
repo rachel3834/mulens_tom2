@@ -14,7 +14,7 @@ For customization instructions, see tom_common/base.html
     <a class="nav-link" href="{% url 'alerts:list' %}">Alerts</a>
 </li>
 <li class="nav-item {% if request.resolver_match.namespace == 'observations' %}active{% endif %}">
-    <a class="nav-link" href="{% url 'tom_observations:list' %}">Observations</a>
+    <a class="nav-link" href="{% url 'requestobs' %}">Request Observations</a>
 </li>
 <li class="nav-item {% if request.resolver_match.namespace == 'dataproducts' %}active{% endif %}">
     <a class="nav-link" href="{% url 'tom_dataproducts:list' %}">Data</a>

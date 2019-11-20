@@ -7,7 +7,7 @@ from datetime import datetime
 from django.conf import settings
 from django_filters.views import FilterView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-
+from django.views.generic.edit import FormView
 from guardian.mixins import PermissionRequiredMixin, PermissionListMixin
 from guardian.shortcuts import get_objects_for_user, get_groups_with_perms, assign_perm
 from django.shortcuts import redirect
@@ -20,7 +20,10 @@ from tom_targets.models import Target, TargetList
 from tom_targets.filters import TargetFilter
 from tom_targets.views import TargetCreateView
 from tom_targets.forms import TargetExtraFormset, TargetNamesFormset
-from .forms import MulensTargetForm
+from tom_observations.views import ManualObservationCreateView
+from .forms import MulensTargetForm, CustomImagingObservationForm
+
+from .lco_facility import LCOInstruments
 
 register = template.Library()
 
@@ -154,3 +157,41 @@ class MulensTargetUpdateView(PermissionRequiredMixin, UpdateView):
         else:
             form.fields['groups'].queryset = self.request.user.groups.all()
         return form
+
+class ImagingObservationRequestView(LoginRequiredMixin, FormView):
+    template_name = 'tom_observations/imaging_observation_request.html'
+    form_class = CustomImagingObservationForm
+
+    def get_target(self, form):
+        print(form.cleaned_data)
+        return Target.objects.filter(id=form.cleaned_data['target_id'])
+
+    def form_valid(self, form):
+        """
+        Runs after form validation. Creates a new ``ObservationRecord`` associated with the specified target and
+        facility.
+        """
+        ObservationRecord.objects.create(
+            target=self.get_target(form),
+            facility=form.cleaned_data['facility'],
+            parameters={},
+            observation_id=form.cleaned_data['observation_id']
+        )
+        return redirect(reverse(
+            'tom_targets:detail', kwargs={'pk': self.get_target(form).id})
+        )
+
+    def get_context_data(self):
+        context = {}
+
+        qs = Target.objects.all()
+        targets = []
+        for entry in qs:
+            targets.append( (entry.pk, entry.name) )
+        context['target_list'] = tuple(targets)
+
+        lcoinstruments = LCOInstruments()
+        context['instrument_list'] = lcoinstruments.get_imagers_tuple()
+        context['filter_list'] = lcoinstruments.get_filter_choices()
+
+        return context

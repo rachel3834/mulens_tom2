@@ -16,7 +16,7 @@ Including another URLconf
 from django.urls import path, include
 
 from .views import TargetGroupsView, MulensTargetCreateView, MulensTargetListView, \
-                    UserProjectDashboard, MulensTargetUpdateView
+                    UserProjectDashboard, MulensTargetUpdateView, ImagingObservationRequestView
 
 app_name = 'mulens_tom2'
 
@@ -26,4 +26,5 @@ urlpatterns = [
     path('create/', MulensTargetCreateView.as_view(template_name='tom_targets/target_form.html'), name='create_mulens'),
     path('<pk>/update/', MulensTargetUpdateView.as_view(), name='update_mulens'),
     path('targetlist/', MulensTargetListView.as_view(template_name='tom_targets/target_list.html'), name='targetlist'),
+    path('requestobs/', ImagingObservationRequestView.as_view(template_name='tom_observations/imaging_observation_request.html'), name='requestobs'),
 ]

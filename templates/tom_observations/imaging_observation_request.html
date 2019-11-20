@@ -1,0 +1,163 @@
+{% extends 'tom_common/base.html' %}
+{% load static bootstrap4 %}
+{% block title %}Imaging Observation{% endblock %}
+{% block content %}
+<h3>Request an Imaging Observation from LCO</h3>
+<form method="POST" action="{% url 'requestobs' %}" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="row">
+    <label for="{{form.target_id.id_for_label}}">Target:</label>
+    <div class="col fieldWrapper">
+        <select name="target">
+            {% for id,name in target_list %}
+                <option value="{{id}}">{{name}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <label for="{{form.instrument.id_for_label}}">Instrument:</label>
+    <div class="col fieldWrapper">
+        <select name="instrument">
+            {% for id,name in instrument_list %}
+                <option value="{{id}}">{{name}}</option>
+            {% endfor %}
+        </select>
+    </div>
+  </div>
+
+  <div class="row">
+        <label for="{{form.exp1_filter.id_for_label}}">Exposure group 1 Filter:</label>
+        <div class="col fieldWrapper">
+            <select name="exp1_filter">
+                {% for value,name in filter_list %}
+                    <option value="{{value}}">{{name}}</option>
+                {% endfor %}
+            </select>
+            </div>
+        <label for="{{form.exp1_exptime.id_for_label}}">Exposure [sec]:</label>
+        <div class="col fieldWrapper">
+                {{form.exp1_exptime.errors}}
+                {{form.exp1_exptime}}
+            </div>
+        <label for="{{form.exp1_nexp.id_for_label}}">Number of exposures:</label>
+        <div class="col fieldWrapper">
+                {{form.exp1_nexp.errors}}
+                {{form.exp1_nexp}}
+            </div>
+  </div>
+
+    <div class="row">
+          <label for="{{form.exp2_filter.id_for_label}}">Exposure group 2 Filter:</label>
+          <div class="col fieldWrapper">
+              <select name="exp2_filter">
+                  {% for value,name in filter_list %}
+                      <option value="{{value}}">{{name}}</option>
+                  {% endfor %}
+              </select>
+              </div>
+          <label for="{{form.exp2_exptime.id_for_label}}">Exposure [sec]:</label>
+          <div class="col fieldWrapper">
+                  {{form.exp2_exptime.errors}}
+                  {{form.exp2_exptime}}
+              </div>
+          <label for="{{form.exp2_nexp.id_for_label}}">Number of exposures:</label>
+          <div class="col fieldWrapper">
+                  {{form.exp2_nexp.errors}}
+                  {{form.exp2_nexp}}
+              </div>
+    </div>
+
+      <div class="row">
+            <label for="{{form.exp3_filter.id_for_label}}">Exposure group 3 Filter:</label>
+            <div class="col fieldWrapper">
+                <select name="exp3_filter">
+                    {% for value,name in filter_list %}
+                        <option value="{{value}}">{{name}}</option>
+                    {% endfor %}
+                </select>
+                </div>
+            <label for="{{form.exp3_exptime.id_for_label}}">Exposure [sec]:</label>
+            <div class="col fieldWrapper">
+                    {{form.exp3_exptime.errors}}
+                    {{form.exp3_exptime}}
+                </div>
+            <label for="{{form.exp3_nexp.id_for_label}}">Number of exposures:</label>
+            <div class="col fieldWrapper">
+                    {{form.exp3_nexp.errors}}
+                    {{form.exp3_nexp}}
+                </div>
+      </div>
+
+      <div class="row">
+
+                <label for="{{form.start_date.id_for_label}}">Start date
+                <button id="help-start-date"><img src="{% static 'img/clipart-question_button.png'%}" width="10" style="border: 0;"></button>
+                      :</label>
+                      <div class="col fieldWrapper">
+                      <p id="correct-start-date-format"> </p>
+                      <script>
+                          document.getElementById("help-start-date").addEventListener("click", show_start_date_format)
+
+                          function show_start_date_format() {
+                            document.getElementById("correct-start-date-format").innerHTML = "Format: YYYY-MM-DDTHH:MM:SS"
+                          }
+                      </script>
+
+                    {{form.start_date.errors}}
+                    {{form.start_date}}
+            </div>
+
+                <label for="{{form.send_date.id_for_label}}">End date
+                <button id="help-end-date"><img src="{% static 'img/clipart-question_button.png'%}" width="10" style="border: 0;"></button>
+                      :</label>
+                <div class="col fieldWrapper">
+                      <p id="correct-end-date-format"> </p>
+                      <script>
+                          document.getElementById("help-end-date").addEventListener("click", show_end_date_format)
+
+                          function show_end_date_format() {
+                            document.getElementById("correct-end-date-format").innerHTML = "Format: YYYY-MM-DDTHH:MM:SS"
+                          }
+                      </script>
+
+                    {{form.end_date.errors}}
+                    {{form.end_date}}
+            </div>
+
+      </div>
+
+      <div class="row">
+        <label for="{{form.cadence.id_for_label}}">Cadence [hrs]:</label>
+        <div class="col fieldWrapper">
+            {{form.cadence.errors}}
+            {{form.cadence}}
+        </div>
+        <label for="{{form.jitter.id_for_label}}">Jitter [hrs]:</label>
+        <div class="col fieldWrapper">
+            {{form.jitter.errors}}
+            {{form.jitter}}
+        </div>
+      </div>
+      <div class="row">
+        <label for="{{form.airmass.id_for_label}}">Airmass limit:</label>
+        <div class="col fieldWrapper">
+            {{form.airmass.errors}}
+            {{form.airmass}}
+        </div>
+        <label for="{{form.lunar_sep.id_for_label}}">Minimum lunar separation [deg]:</label>
+        <div class="col fieldWrapper">
+            {{form.lunar_sep.errors}}
+            {{form.lunar_sep}}
+        </div>
+      </div>
+      <div class="row">
+        <label for="{{oform.IPP.id_for_label}}"><a href="https://lco.global/files/User_Documentation/the_new_priority_factor.pdf">Intra-proposal Priority:</a></label>
+        <div class="col fieldWrapper">
+            {{form.ipp.errors}}
+            {{form.ipp}}
+        </div>
+        <div class="col fieldWrapper">
+          <input type="submit" class="btn btn-primary" value="Submit">
+        </div>
+      </div>
+</form>
+{% endblock %}
