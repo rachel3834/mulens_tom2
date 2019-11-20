@@ -23,19 +23,17 @@ class GaiaQueryForm(GenericQueryForm):
         help_text='RA,Dec,radius in degrees'
     )
 
+    def clean(self):
+        if len(self.cleaned_data['target_name']) == 0 and \
+            len(self.cleaned_data['cone']) == 0:
+            raise forms.ValidationError(
+                "Please enter either a target name or cone search parameters"
+                )
 
 class GaiaBroker(GenericBroker):
     name = 'Gaia'
     form = GaiaQueryForm
 
-    def clean(self, parameters):
-        cleaned_data = self.cleaned_data()
-
-        if parameters['target_name'] is None and parameters['cone'] is None:
-            raise forms.ValidationError(
-                "Please enter either a target name or cone search parameters"
-                )
-        
     def fetch_alerts(self, parameters):
         """Must return an iterator"""
         response = requests.get(BROKER_URL)
